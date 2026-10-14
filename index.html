@@ -3,110 +3,156 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>누가 더 클까 랭킹</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<title>누가 더 클까</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
-  --bg:#ffffff; --panel:#ffffff; --ink:#111111; --muted:#8a8a8a; --line:#e6e6e6;
-  --accent:#111111; --accent-soft:#f2f2f2; --on-accent:#ffffff;
-  --gold:#111111; --silver:#555555; --bronze:#8a8a8a;
-  --shadow:0 1px 2px rgba(0,0,0,.04);
+  --bg:#ffffff; --ink:#111111; --ink2:#3a3a3a; --muted:#9a9a9a; --line:#ececec; --soft:#f5f5f5;
+  --on-ink:#ffffff; --lift:0 18px 40px -18px rgba(0,0,0,.28);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0e0e0e; --panel:#161616; --ink:#f5f5f5; --muted:#8a8a8a; --line:#2a2a2a;
-    --accent:#f5f5f5; --accent-soft:#232323; --on-accent:#0e0e0e;
-    --gold:#f5f5f5; --silver:#b0b0b0; --bronze:#7a7a7a; --shadow:none;
+    --bg:#0f0f0f; --ink:#f4f4f4; --ink2:#cfcfcf; --muted:#777; --line:#232323; --soft:#1a1a1a;
+    --on-ink:#0f0f0f; --lift:0 18px 40px -18px rgba(0,0,0,.8);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0e0e0e; --panel:#161616; --ink:#f5f5f5; --muted:#8a8a8a; --line:#2a2a2a;
-  --accent:#f5f5f5; --accent-soft:#232323; --on-accent:#0e0e0e;
-  --gold:#f5f5f5; --silver:#b0b0b0; --bronze:#7a7a7a; --shadow:none;
+  --bg:#0f0f0f; --ink:#f4f4f4; --ink2:#cfcfcf; --muted:#777; --line:#232323; --soft:#1a1a1a;
+  --on-ink:#0f0f0f; --lift:0 18px 40px -18px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;min-height:100vh}
-main{max-width:720px;margin:0 auto;padding:28px 16px 48px}
-header{text-align:center;margin-bottom:22px}
-h1{font-family:"Noto Sans KR",sans-serif;font-weight:900;letter-spacing:-.5px;font-size:clamp(34px,8vw,52px);margin:0;letter-spacing:.5px}
-h1 em{font-style:normal;color:var(--accent)}
-.sub{color:var(--muted);margin:6px 0 0}
-.progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
-.bar{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
-.count{text-align:center;color:var(--muted);font-size:14px;margin:8px 0 18px}
-.arena{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
-.card{appearance:none;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:22px;
-  padding:10px 10px 16px;cursor:pointer;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:14px;
-  font:inherit;transition:transform .12s,border-color .12s,background .12s;min-width:0}
-.card:hover{transform:translateY(-3px);border-color:var(--accent)}
-.card:active{transform:translateY(1px)}
-.card.picked{background:var(--accent-soft);border-color:var(--accent);transform:scale(1.03)}
-.card.lost{opacity:.35;filter:grayscale(1)}
-.av{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;background:var(--accent-soft)}
-.nm{font-family:"Noto Sans KR",sans-serif;font-weight:700;font-size:clamp(20px,5.5vw,30px);word-break:keep-all;text-align:center}
-.vs{font-family:"Noto Sans KR",sans-serif;font-weight:700;color:var(--accent);font-size:clamp(18px,5vw,26px)}
-.hint{text-align:center;color:var(--muted);font-size:13px;margin-top:14px}
-.tools{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
-.tools button{appearance:none;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;
-  padding:9px 16px;border-radius:99px;cursor:pointer;font-size:15px}
-.tools button:hover{border-color:var(--accent)}
-.tools button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.tools button:disabled{opacity:.4;cursor:default}
-h2{font-family:"Noto Sans KR",sans-serif;font-weight:900;letter-spacing:-.5px;font-size:30px;text-align:center;margin:0 0 4px}
-.note{text-align:center;color:var(--muted);font-size:14px;margin:0 0 18px}
-ol{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-li{display:grid;grid-template-columns:40px 44px 1fr auto;gap:12px;align-items:center;background:var(--panel);
-  border:1.5px solid var(--line);border-radius:16px;padding:10px 14px;position:relative;overflow:hidden}
-li .fill{position:absolute;inset:0 auto 0 0;background:var(--accent-soft);z-index:0;transition:width .4s}
-li>*:not(.fill){position:relative;z-index:1}
-li .rk{font-family:"Noto Sans KR",sans-serif;font-weight:700;font-size:24px;text-align:center}
-li.r1 .rk{color:var(--gold)} li.r2 .rk{color:var(--silver)} li.r3 .rk{color:var(--bronze)}
-li .av{width:44px;border-radius:50%}
-li .nm{font-size:20px;text-align:left}
-li .rec{color:var(--muted);font-size:14px;white-space:nowrap}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
-  padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;font-size:14px}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+body{background:var(--bg);color:var(--ink);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;word-break:keep-all}
+button{font:inherit;color:inherit}
+
+/* 상단 진행 라인 */
+.track{position:fixed;inset:0 0 auto 0;height:2px;background:var(--line);z-index:10}
+.bar{height:100%;width:0;background:var(--ink);transition:width .35s ease}
+
+.shell{min-height:100vh;min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;
+  max-width:1040px;margin:0 auto;padding:0 24px}
+.head{display:flex;justify-content:space-between;align-items:center;height:68px}
+.brand{font-weight:700;font-size:15px;letter-spacing:-0.02em}
+.meta{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta b{color:var(--ink);font-weight:600}
+main{display:flex;align-items:center;justify-content:center;padding:12px 0 24px}
+
+/* 대결 화면 */
+.stage{width:100%;text-align:center}
+.q{font-size:clamp(24px,3.2vw,34px);font-weight:700;letter-spacing:-0.035em;margin:0}
+.q-sub{margin:8px 0 0;color:var(--muted);font-size:14px}
+.arena{display:grid;grid-template-columns:minmax(0,240px) auto minmax(0,240px);justify-content:center;align-items:center;
+  gap:clamp(14px,4.5vw,56px);margin-top:clamp(28px,5vh,48px)}
+.card{appearance:none;border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:14px;
+  transition:opacity .25s,transform .25s;-webkit-tap-highlight-color:transparent}
+.ph{position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;background:var(--soft);
+  box-shadow:0 0 0 1px var(--line);transition:box-shadow .25s,transform .25s}
+.ph img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.card:hover .ph{transform:translateY(-4px);box-shadow:0 0 0 1px var(--line),var(--lift)}
+.card:hover .ph img{transform:scale(1.035)}
+.card:focus-visible{outline:none}
+.card:focus-visible .ph{box-shadow:0 0 0 2px var(--ink)}
+.nm{font-size:17px;font-weight:600;letter-spacing:-0.02em}
+.card.picked .ph{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink);transform:scale(1.02)}
+.card.lost{opacity:.25}
+.vs{font-size:11px;font-weight:600;letter-spacing:.24em;color:var(--muted);text-transform:uppercase;padding-bottom:31px}
+
+/* 하단 도구 */
+.foot{display:flex;justify-content:center;gap:2px;padding:12px 0 28px}
+.tbtn{appearance:none;border:0;background:none;color:var(--muted);font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;transition:.15s}
+.tbtn:hover:not(:disabled){color:var(--ink);background:var(--soft)}
+.tbtn:disabled{opacity:.4;cursor:default}
+.kbd{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;line-height:18px;margin:0 1px}
+
+/* 결과 화면 */
+.results{width:100%;max-width:560px}
+.rhead{text-align:center;margin-bottom:32px}
+.eyebrow{margin:0;font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.rtitle{margin:6px 0 0;font-size:clamp(26px,3.4vw,34px);font-weight:700;letter-spacing:-0.035em}
+.note{margin:8px 0 0;color:var(--muted);font-size:13px}
+.podium{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:clamp(10px,2.5vw,20px);align-items:end;margin-bottom:28px}
+.pod{text-align:center}
+.pod .ph{border-radius:16px}
+.pod.p1{order:2}.pod.p2{order:1}.pod.p3{order:3}
+.pod.p1 .ph{box-shadow:0 0 0 1px var(--line),var(--lift)}
+.pod .rk{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:12px 0 2px;font-variant-numeric:tabular-nums}
+.pod .pn{font-size:16px;font-weight:700;letter-spacing:-0.02em}
+.pod.p1 .pn{font-size:18px}
+.pod .pr{font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:28px 40px 1fr auto;gap:14px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line)}
+.row .rk{font-size:14px;font-weight:600;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.row img{width:40px;height:40px;border-radius:50%;object-fit:cover;display:block;background:var(--soft)}
+.row .nm{font-size:15px}
+.meter{height:3px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden;max-width:180px}
+.meter i{display:block;height:100%;background:var(--ink2);border-radius:3px}
+.row .rec{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ractions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:32px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--bg);font-size:14px;font-weight:500;padding:10px 18px;border-radius:999px;cursor:pointer;transition:.15s}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);background:var(--ink);color:var(--on-ink);
+  padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;font-size:13px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 [hidden]{display:none!important}
+
+@media (max-width:560px){
+  .shell{padding:0 16px}
+  .arena{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px}
+  .vs{font-size:10px;letter-spacing:.14em;padding-bottom:30px}
+  .nm{font-size:16px}
+  .hint{display:none}
+}
+@media (hover:none){ .card:hover .ph{transform:none;box-shadow:0 0 0 1px var(--line)} .card:hover .ph img{transform:none} }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <h1>누가 더 <em>클까?</em></h1>
-    <p class="sub">둘 중 더 큰 쪽을 골라 주세요</p>
+<div class="track"><div class="bar" id="bar"></div></div>
+<div class="shell">
+  <header class="head">
+    <div class="brand">누가 더 클까</div>
+    <div class="meta" id="meta"></div>
   </header>
 
-  <section id="play">
-    <div class="progress"><div class="bar" id="bar"></div></div>
-    <div class="count" id="count"></div>
-    <div class="arena">
-      <button class="card" id="left"><img class="av" alt=""><div class="nm"></div></button>
-      <div class="vs">VS</div>
-      <button class="card" id="right"><img class="av" alt=""><div class="nm"></div></button>
-    </div>
-    <p class="hint">키보드 ← → 로도 고를 수 있어요</p>
-    <div class="tools">
-      <button id="undo">↶ 되돌리기</button>
-      <button id="peek">현재 순위 보기</button>
-      <button id="reset">처음부터</button>
-    </div>
-  </section>
+  <main>
+    <section id="play" class="stage">
+      <h1 class="q">둘 중 누가 더 클까요?</h1>
+      <p class="q-sub">더 크다고 생각하는 쪽을 골라 주세요</p>
+      <div class="arena">
+        <button class="card" id="left"><div class="ph"><img alt=""></div><div class="nm"></div></button>
+        <span class="vs">vs</span>
+        <button class="card" id="right"><div class="ph"><img alt=""></div><div class="nm"></div></button>
+      </div>
+    </section>
 
-  <section id="result" hidden>
-    <h2 id="rtitle">최종 순위</h2>
-    <p class="note" id="rnote"></p>
-    <ol id="rank"></ol>
-    <div class="tools">
-      <button id="back" class="primary">계속 고르기</button>
-      <button id="undo2">↶ 마지막 선택 되돌리기</button>
-      <button id="copy">순위 복사</button>
-      <button id="again">처음부터 다시</button>
-    </div>
-  </section>
-</main>
+    <section id="result" class="results" hidden>
+      <div class="rhead">
+        <p class="eyebrow" id="reyebrow">Result</p>
+        <h2 class="rtitle" id="rtitle">최종 순위</h2>
+        <p class="note" id="rnote"></p>
+      </div>
+      <div class="podium" id="podium"></div>
+      <ol class="list" id="rank"></ol>
+      <div class="ractions">
+        <button class="btn primary" id="back">계속 고르기</button>
+        <button class="btn" id="undo2">마지막 선택 되돌리기</button>
+        <button class="btn" id="copy">순위 복사</button>
+        <button class="btn" id="again">처음부터</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot" id="foot">
+    <button class="tbtn" id="undo">되돌리기</button>
+    <button class="tbtn" id="peek">현재 순위</button>
+    <button class="tbtn" id="reset">처음부터</button>
+    <span class="tbtn hint" style="cursor:default"><span class="kbd">←</span><span class="kbd">→</span> 키로도 선택</span>
+  </footer>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -149,9 +195,12 @@ let state = load();
 let peeking = false;
 let locked = false;
 
+// 사진 미리 불러오기
+Object.values(IMGS).forEach(src => { const im = new Image(); im.src = src; });
+
 function setCard(el, i){
-  el.querySelector(".av").src = img(i);
-  el.querySelector(".av").alt = NAMES[i];
+  const im = el.querySelector("img");
+  im.src = img(i); im.alt = NAMES[i];
   el.querySelector(".nm").textContent = NAMES[i];
   el.classList.remove("picked","lost");
 }
@@ -161,9 +210,10 @@ function render(){
   $("bar").style.width = (done / TOTAL * 100) + "%";
   $("undo").disabled = done === 0;
   $("undo2").disabled = done === 0;
-  if(done >= TOTAL || peeking){ showResult(done >= TOTAL); return; }
-  $("play").hidden = false; $("result").hidden = true;
-  $("count").textContent = `${done + 1} / ${TOTAL} 번째 대결`;
+  const final = done >= TOTAL;
+  $("meta").innerHTML = final ? "<b>완료</b>" : `<b>${String(Math.min(done+1,TOTAL)).padStart(2,"0")}</b> / ${TOTAL}`;
+  if(final || peeking){ showResult(final); return; }
+  $("play").hidden = false; $("result").hidden = true; $("foot").hidden = false;
   const [a,b] = state.pairs[done];
   setCard($("left"), a); setCard($("right"), b);
 }
@@ -177,7 +227,7 @@ function choose(side){
   setTimeout(() => {
     state.winners.push(pair[side]);
     save(); locked = false; render();
-  }, 220);
+  }, 260);
 }
 
 function undo(){
@@ -205,20 +255,29 @@ function ranking(){
 }
 
 function showResult(final){
-  $("play").hidden = true; $("result").hidden = false;
+  $("play").hidden = true; $("foot").hidden = true; $("result").hidden = false;
   $("back").hidden = final;
+  $("reyebrow").textContent = final ? "Result" : "In progress";
   $("rtitle").textContent = final ? "최종 순위" : "현재 순위";
   $("rnote").textContent = final
-    ? `${TOTAL}번의 대결 결과예요. 승수가 같으면 서로 붙었던 결과로 정했어요.`
-    : `${state.winners.length} / ${TOTAL} 대결까지 반영된 중간 순위예요.`;
-  $("rank").innerHTML = ranking().map(r => `
-    <li class="r${r.rank}">
-      <div class="fill" style="width:${r.w/(N-1)*100}%"></div>
-      <span class="rk">${r.rank}</span>
-      <img class="av" src="${img(r.i)}" alt="${NAMES[r.i]}">
-      <span class="nm">${NAMES[r.i]}</span>
-      <span class="rec">${r.w}승 ${r.l}패</span>
+    ? `${TOTAL}번의 대결 결과 · 승수가 같으면 맞대결 결과로 정했어요`
+    : `${state.winners.length} / ${TOTAL} 대결까지 반영된 중간 순위예요`;
+  const r = ranking();
+  $("podium").innerHTML = r.slice(0,3).map((x,k) => `
+    <div class="pod p${k+1}">
+      <div class="ph"><img src="${img(x.i)}" alt="${NAMES[x.i]}"></div>
+      <span class="rk">${x.rank}위</span>
+      <div class="pn">${NAMES[x.i]}</div>
+      <div class="pr">${x.w}승 ${x.l}패</div>
+    </div>`).join("");
+  $("rank").innerHTML = r.slice(3).map(x => `
+    <li class="row">
+      <span class="rk">${x.rank}</span>
+      <img src="${img(x.i)}" alt="${NAMES[x.i]}">
+      <div><div class="nm">${NAMES[x.i]}</div><div class="meter"><i style="width:${x.w/(N-1)*100}%"></i></div></div>
+      <span class="rec">${x.w}승 ${x.l}패</span>
     </li>`).join("");
+  window.scrollTo(0,0);
 }
 
 function reset(){
