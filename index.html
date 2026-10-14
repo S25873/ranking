@@ -120,8 +120,8 @@ main{display:flex;align-items:center;justify-content:center;padding:12px 0 24px}
 
   <main>
     <section id="play" class="stage">
-      <h1 class="q">둘 중 누가 더 클까요?</h1>
-      <p class="q-sub">더 크다고 생각하는 쪽을 골라 주세요</p>
+      <h1 class="q">누가 더 클까?</h1>
+      <p class="q-sub">당신의 선택은...</p>
       <div class="arena">
         <button class="card" id="left"><div class="ph"><img alt=""></div><div class="nm"></div></button>
         <span class="vs">vs</span>
@@ -156,7 +156,11 @@ main{display:flex;align-items:center;justify-content:center;padding:12px 0 24px}
 <div class="toast" id="toast"></div>
 
 <script>
-const NAMES = ["단테","루카스","마티스","도미닉","디에고","에이먼","로언","카시안","에드리언","엘리아스","주세페","요하네스"];
+// 전체 캐릭터 (사진도 모두 들어 있음)
+const ALL_NAMES = ["단테","루카스","마티스","도미닉","디에고","에이먼","로언","카시안","에드리언","엘리아스","주세페","요하네스"];
+// 랭킹에서 잠시 빼둘 캐릭터 — 다시 넣으려면 여기서 이름만 지우면 돼요
+const EXCLUDED = ["주세페","엘리아스","요하네스"];
+const NAMES = ALL_NAMES.filter(n => !EXCLUDED.includes(n));
 const N = NAMES.length;
 const TOTAL = N * (N - 1) / 2;
 const KEY = "bigger-ranking-v1";
@@ -235,7 +239,7 @@ function undo(){
   state.winners.pop(); peeking = false; save(); render();
 }
 
-// 승수로 정렬 → 승수가 같으면 그 사람들끼리의 맞대결 승수 → 그래도 같으면 공동 순위
+// (승 - 패)로 정렬 → 같으면 승이 많은 쪽 → 그래도 같으면 그 사람들끼리의 맞대결 승수 → 그래도 같으면 공동 순위
 function ranking(){
   const wins = Array(N).fill(0), losses = Array(N).fill(0);
   const beat = Array.from({length:N}, () => Array(N).fill(false));
@@ -243,13 +247,15 @@ function ranking(){
     const p = state.pairs[k], l = p[0] === w ? p[1] : p[0];
     wins[w]++; losses[l]++; beat[w][l] = true;
   });
+  const net = i => wins[i] - losses[i];
+  const same = (i,j) => wins[i]===wins[j] && losses[i]===losses[j];
   const sub = Array(N).fill(0);
-  for(let i=0;i<N;i++) for(let j=0;j<N;j++) if(i!==j && wins[i]===wins[j] && beat[i][j]) sub[i]++;
-  const order = [...Array(N).keys()].sort((x,y) => wins[y]-wins[x] || sub[y]-sub[x] || x-y);
+  for(let i=0;i<N;i++) for(let j=0;j<N;j++) if(i!==j && same(i,j) && beat[i][j]) sub[i]++;
+  const order = [...Array(N).keys()].sort((x,y) => net(y)-net(x) || wins[y]-wins[x] || sub[y]-sub[x] || x-y);
   let rank = 0;
   return order.map((i,pos) => {
     const prev = order[pos-1];
-    if(pos === 0 || wins[i] !== wins[prev] || sub[i] !== sub[prev]) rank = pos + 1;
+    if(pos === 0 || !same(i,prev) || sub[i] !== sub[prev]) rank = pos + 1;
     return { i, rank, w: wins[i], l: losses[i] };
   });
 }
